@@ -110,6 +110,23 @@ class Folder extends Model {
        return await Folder.get_path(this.id);
    }
 
+   static async delete_folder(folder_id) {
+        const folder = await Folder.findByPk(folder_id);
+        const folders = await Folder.findAll({where: {
+            father_folder_id: folder.id
+        }});
+        const files = await require('./File').findAll({where: {
+            folder_id: folder.id
+        }});
+        await Promise.all(files.map((file) => file.destroy()));
+        await Promise.all(folders.map((fold) => fold.delete_folder())); 
+        await folder.destroy();
+   }    
+
+   async delete_folder() {
+        return await Folder.delete_folder(this.id);
+   }
+
 }
 
 module.exports = Folder;

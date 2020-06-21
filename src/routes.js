@@ -9,23 +9,28 @@ const upload = require('./middlewares/upload');
 
 routes = express.Router();
 
-
 routes.get('/', auth, pagecontroller.login);
 routes.get('/join', auth, pagecontroller.signup);
 
 routes.get('/folder/:folder_id', auth, foldercontroller.listFolder);
 routes.get('/root', auth, foldercontroller.root);
 
-
-routes.get('/getfile/:file_id', filecontroller.getFile);
+routes.get('/getfile/:file_id', auth, filecontroller.getFile);
 
 routes.post('/signup', usercontroller.store);
 routes.post('/session', usercontroller.login);
 routes.post('/logout', usercontroller.logout);
+routes.post('/changepassword', auth, usercontroller.changePassword)
+
+routes.post('/upload', auth, upload, filecontroller.uploadFile);
+routes.post('/updatefile', auth, upload, filecontroller.updateFile);
+routes.post('/deletefile/:file_id', auth, filecontroller.deleteFile);
+routes.post('/movefile', auth, filecontroller.moveFile);
+routes.post('/renamefile', auth, filecontroller.renameFile);
 
 routes.post('/createfolder', auth, foldercontroller.createFolder);
-routes.post('/upload', auth, upload, filecontroller.UploadFile);
-routes.post('/deletefile', auth, filecontroller.deleteFile);
-routes.post('/movefile', auth, filecontroller.moveFile);
+routes.post('/movefolder', auth, foldercontroller.moveFolder);
+routes.post('/deletefolder/:folder_id', auth, foldercontroller.deleteFolder);
+routes.post('/renamefolder', auth, foldercontroller.renameFolder);
 
 module.exports = routes;

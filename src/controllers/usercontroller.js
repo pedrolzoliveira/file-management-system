@@ -9,8 +9,7 @@ const connection = require('../database/index');
 module.exports = {
     async store(req, res) {
         try {
-            const {name, email} = req.body;
-            let {password} = req.body;
+            let {name, email, password} = req.body;
             if (!name || !email || !password || name == false || email == false || password == false) {
                 return res.status(400).send({
                     error: {
@@ -32,6 +31,8 @@ module.exports = {
                     }
                 });
             }
+            name = name.toUpperCase().split(' ').filter((val) => val).join(' ');
+            email = email.trim();
             const t = await connection.transaction();
             if (await User.findOne({where: {email}})) {
                 await t.rollback();
@@ -107,6 +108,12 @@ module.exports = {
                     }
                 });
             }
+            if (password.length < 8)
+                return res.status(400).send({
+                    error: {
+                        message: 'the password is too short'
+                    }
+                });
             const user = await User.findOne({where: {email}});
             if (!user) {
                 return res.status(400).send({
@@ -138,7 +145,60 @@ module.exports = {
         } catch(err) {
             return res.status(500).send({
                 error: {
-                    message: 'unhandled error'
+                    message: err.message
+                }
+            });
+        }
+    },
+
+    async changePassword(req, res) {
+        try {
+            if (!req.IsAuth)
+                return res.status(403).send({
+                    error: {
+                        message: 'permission danied'
+                    }
+                });
+            const {user} = req;
+            let {password, new_password} = req.body;
+            if (!password || password == false || !new_password || new_password == false)
+                return res.status(400).send({
+                    error: {
+                        message: 'missing information'
+                    }
+                });
+            if (new_password.length < 8)
+                return res.status(400).send({
+                    error: {
+                        message: 'new password is too short'
+                    }
+                });
+            
+            const [user_db, salt] = await Promise.all([
+                User.findByPk(user.id),
+                Salt.findByPk(user.id)
+            ]);
+            if (!user_db || !salt)
+                return res.status(400).send({
+                    error: {
+                        message: 'user not found'
+                    }
+                });
+            if (!await bcrypt.compare(password + salt.salt, user_db.password)) 
+                return res.status(400).send({
+                    error: {
+                        message: 'invalid password'
+                    }
+                });
+            new_password = await bcrypt.hash(new_password + salt.salt, 10); 
+            await user_db.update({
+                password: new_password
+            });   
+            return res.status(200).send();
+        } catch(err) {
+            return res.status(500).send({
+                error: {
+                    message: err.message
                 }
             });
         }
@@ -147,10 +207,10 @@ module.exports = {
     async logout(req, res) {
         try {
             const token = req.cookies['user_session'];
-            if (!token) return res.json({ok: true});
+            if (!token) return res.status(200).send();
             
             const solved = Token.solveToken(token);
-            if (!solved.ok) return res.json({ok: true});
+            if (!solved.ok) return res.status(200).send();
     
             await Token.findOrCreate({
                 where: {
@@ -162,7 +222,7 @@ module.exports = {
                 }  
             });
             res.clearCookie('user_session');
-            return res.status(200).send({ok: true});
+            return res.status(200).send();
         } catch(err) {
             return res.status(500).send({
                 error: {
