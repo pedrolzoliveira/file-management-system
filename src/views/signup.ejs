@@ -2,15 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="public/Css/login.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastre-se</title>
 </head>
 <body>
-    <form action="/signup" method="post">
-        Email: <input type="email" name="email" id="email"> <br>
-        Nome: <input type="text" name="name" id="name"> <br>
-        Senha: <input type="password" name="password" id="password">
-    </form>
-    <p>Já tem uma conta? <a href="/">Fazer login</a></p>
+    <div class="all">
+        <div class="esquerda"></div>
+        <div class="direita">
+        <div class="caixa">
+        <form action="/signup" method="post">
+            Email: <input type="email" name="email" id="email"> <br>
+            Nome: <input type="text" name="name" id="name"> <br>
+            Senha: <input type="password" name="password" id="password">
+        </form>
+        </div>
+        <p class="cadastro">Já tem uma conta? <a href="/">Fazer login</a></p>
+        </div>
+        </div>
+    
 </body>
 </html>

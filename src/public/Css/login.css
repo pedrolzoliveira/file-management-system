@@ -1,0 +1,70 @@
+
+*{
+    margin:0;
+    padding:0;
+}
+body{
+    background:whitesmoke;
+    font-family:arial;
+}
+#password,
+#email
+{
+    border-radius:10px;
+    padding:1px;
+    border:0;
+    background:whitesmoke;
+    margin: 5px;
+}
+input[value="Entrar"]{
+    border-radius:10px;
+    padding:10px;
+    border:0;
+    background:whitesmoke;
+    margin: 5px;
+}
+input[value="Entrar"]:hover{
+    opacity: 50%;
+    cursor: pointer;
+}
+a{
+text-decoration:none;
+color:black;
+}
+a:hover{
+text-decoration:underline;
+font-size:20px;
+color:darkblue;
+font-size: 20px;
+}
+.cadastro{
+    font-size: 15px;
+    
+}
+.all{
+
+position: absolute;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+text-align: center;
+display: inline-flex;
+
+}
+
+.esquerda{
+    background-image: url(../img/Login.png);
+    padding: 100px;
+    width: 30vh;
+    height: 5.5vh;
+    
+}
+.direita{
+    background: lightblue;
+    padding: 30px;
+    width: 30vh;
+    height: 19.8vh;
+}
+.caixa{
+    margin-top: 45px;
+}
