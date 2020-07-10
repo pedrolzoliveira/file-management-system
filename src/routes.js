@@ -23,7 +23,7 @@ routes.post('/logout', usercontroller.logout);
 routes.post('/changepassword', auth, usercontroller.changePassword)
 
 routes.post('/upload', auth, upload, filecontroller.uploadFile);
-routes.post('/updatefile', auth, upload, filecontroller.updateFile);
+routes.post('/updatefile/:file_id', auth, upload, filecontroller.updateFile);
 routes.post('/deletefile/:file_id', auth, filecontroller.deleteFile);
 routes.post('/movefile', auth, filecontroller.moveFile);
 routes.post('/renamefile', auth, filecontroller.renameFile);

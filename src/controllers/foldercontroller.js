@@ -101,6 +101,7 @@ module.exports = {
                 }})   
             ]);
             return res.status(200).send({
+                folder: folder,
                 folders: retorno[0],
                 files: retorno[1]
             });

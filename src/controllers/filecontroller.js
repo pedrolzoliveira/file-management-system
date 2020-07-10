@@ -14,6 +14,12 @@ module.exports = {
             });
         const {folder_id} = req.body;
         const {file, user} = req; 
+        if (!file)
+            return res.status(400).send({
+                error: {
+                    message: 'file not send'
+                }
+            });
         if (!folder_id || folder_id == false) {
             fs.unlinkSync(file.path);
             return res.status(400).send({
@@ -25,7 +31,7 @@ module.exports = {
         const folder = await Folder.findByPk(folder_id);
         if (!folder) {
             fs.unlinkSync(file.path);
-            return res.status(400).send({
+            return res.status(401).send({
                 error: {
                     message: 'folder not found',
                 }
@@ -83,11 +89,25 @@ module.exports = {
                     }
                 });
             const {user, file} = req;
-            const {file_id} = req.body;
+            const {file_id} = req.params;
+            if (!file) 
+                return res.status(400).send({
+                    error: {
+                        message: 'file not send'
+                    }
+                });
+            if (!file_id || file_id == false) {
+                fs.unlinkSync(file.path);
+                return res.status(400).send({
+                    error: {
+                        message: 'missing information'
+                    }
+                });
+            }
             const file_db = await File.findByPk(file_id);
             if (!file_db) {
                 fs.unlinkSync(file.path);
-                return res.status(400).send({
+                return res.status(401).send({
                     error: {
                         message: 'file not found'
                     }
@@ -101,7 +121,6 @@ module.exports = {
                     }
                 });
             }
-                
             if (file.originalname != file_db.name) {
                 fs.unlinkSync(file.path);
                 return res.status(400).send({
@@ -116,7 +135,7 @@ module.exports = {
                 return res.status(200).send();
             } else {
                 fs.unlinkSync(file.path);
-                return res.status(400).send({
+                return res.status(401).send({
                     error: {
                         message: 'file not found'
                     }
@@ -205,9 +224,21 @@ module.exports = {
                         message: 'permission danied'
                     }
                 });
-            const {file_id} = req.params;
             const {user} = req;
+            const {file_id} = req.params;
+            if (!file_id || file_id == false)
+            return res.status(400).send({
+                error: {
+                    message: 'missing information'
+                }
+            });
             const file = await File.findByPk(file_id);
+            if (!file)
+                return res.status(400).send({
+                    error: {
+                        message: 'file not found'
+                    }
+                });
             if (file.owner != user.id)
                 return res.status(403).send({
                     error: {
@@ -234,7 +265,8 @@ module.exports = {
                     }
                 });
             const {user} = req;
-            const {file_id, new_name} = req.body;
+            const {file_id} = req.body;
+            let {new_name} = req.body;
             if (!file_id || file_id == false || !new_name || new_name == false)
                 return res.status(400).send({
                     error: {
@@ -254,6 +286,7 @@ module.exports = {
                         message: 'permission danied'
                     }
                 });
+            new_name = new_name + file.file_extension;
             if (await File.findOne({where: {folder_id: file.folder_id, name: new_name}})) 
                 return res.status(400).send({
                     error: {
@@ -269,8 +302,7 @@ module.exports = {
             if (fs.existsSync(file_path)) {
                 fs.renameSync(file_path, new_path);
                 await file.update({
-                    name: new_name,
-                    file_extension: path.extname(new_name)
+                    name: new_name
                 });
                 return res.status(200).send({file});
             } else {
